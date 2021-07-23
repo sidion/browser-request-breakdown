@@ -33,7 +33,7 @@ I have included links where I have found deeper information but they should be s
 2. The OS goes through an [interrupt](http://faculty.salina.k-state.edu/tim/ossg/Introduction/OSworking.html)
 3. The OS will pass the keypress to the application in focus; in this case the browser which will then begin the process of loading the web page
 
-
+---
 
 
 
@@ -164,7 +164,7 @@ For our example will likely make a request to a database for the ‘gitlab’ re
 #### Databases:
 There are a number of possible Databases the system could be connecting to each with pros and cons
 Some examples:
-- [SQL compliant](https://www.w3schools.com/sql/sql_intro.asp): (This is a good point to talk about [DB indexes}(https://en.wikipedia.org/wiki/Database_index))
+- [SQL compliant](https://www.w3schools.com/sql/sql_intro.asp): (This is a good point to talk about [DB indexes](https://en.wikipedia.org/wiki/Database_index))
    - Mysql
    - Postgres
 
