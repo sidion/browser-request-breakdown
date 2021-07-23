@@ -1,14 +1,30 @@
 # browser-request-breakdown
-A document to walk through talking points of a browser request
-This is not a complete and exhaustive list down to the electron level but is trying to touch on many interesting topics or talking points that can be delved into further
+**What**:
+A document trying to go over many touch points in the context of "what happens when a browsers makes a request to get a webpage"
 
-Note: for reduced complexity this is making a number of assumptions, each assumption will be stated when appropriate
+**who**:
+This document is bias towards back end web developer concepts and will benefit developers who are in that role but anyone interested in or working with web development or internet requests could benefit from
+
+**Caveats**:
+This is not a complete exhaustive list, as mentioned in the who, this has an audience so we will not be diving into things like [how computers and graphic cards render things to a monitor](https://computer.howstuffworks.com/graphics-card.htm)
+
+There are also a number of assumptions made throughout the document, I have tried to note them where they are
+
+I have included links where I have found deeper information but they should be starting off points for deeper dives and not considered exhaustive
+
+---
+
+
+
 
 # Preamble:
-we assume:
-1. there is a functional computer with internet connection
+**we assume**:
+1. there is a functional computer with internet connection  (note the internet connection is a deep subject with countless rabbit holes and will require its own document to say the least)
 2. that computer has a browser open and a url present in the address bar - we will use  https://gitlab.com/gitlab-org/gitlab as an example
 3. the breakdown starts when the user hits the enter/return key to execute the request
+
+
+
 
 
 # Pre-Network:
@@ -20,11 +36,13 @@ we assume:
 
 
 
+
 # Client Side
 
 ## OSI Model:
 The [OSI model](https://en.wikipedia.org/wiki/OSI_model) is a model that breaks down network traffic into 7 layers
 for the purposes of this conversation we will not go down into the media layers(layer 1-3) but those layers are interesting topics if you are creating or primarily working with the physical network
+
 
 
 ## DNS:
@@ -38,7 +56,7 @@ DNS will resolve gitlab.com to an IP address.
    - router or internal network DNS resolver
    - ISP cache
    - [Root Name Servers](https://en.wikipedia.org/wiki/Root_name_server)
-3. at the end of this process the browser will have an IP address to move forward with
+3. at the end of this process the browser will have an IP address to move forward with, it is most likely that address will be an IPv4 address but might be IPv6 for more information see [here](https://www.thousandeyes.com/learning/techtorials/ipv4-vs-ipv6)
 
 
 
@@ -53,9 +71,11 @@ I will not go into detail on the TCP connection setup, if you wish to read more 
 the important part here is that the TCP connection to the server sets up a method of communication between the browser and server to facilitate the next steps
 
 
+
 ## Transport Protocol:
 if we look at our example url: https://gitlab.com/gitlab-org/gitlab
 we can see we are using [https](https://www.cloudflare.com/en-ca/learning/ssl/what-is-https/) which is an encrypted version of [http](https://www.cloudflare.com/learning/ddos/glossary/hypertext-transfer-protocol-http/). HTTPS usually uses a protocol called [Transport Layer Security(TLS)](https://www.cloudflare.com/learning/ssl/transport-layer-security-tls/) to encrypt the data being used in the exchange between the browser and the server
+
 
 
 ## REST:
@@ -76,19 +96,30 @@ GET the resource `gitlab-org/gitlab` from the server `gitlab.com` using the `htt
 
 It is also worth mentioning [request headers](https://developer.mozilla.org/en-US/docs/Glossary/Request_header) at this point, which will contain information about the requesting system and some instruction to the server about what the system would like back like which language the content should be in
 
+---
+
+
+
 
 # Server Side:
 At this point it's worth jumping over the server side of this process where we will touch on some infrastructure and some application process before getting back to the browser and how it interacts with the response
 
+
+
 ## Server Resolution:
 In a very small production environment there might only be 1 web server and the DNS resolution might resolve to that specific server
-It is much more likely that there are many webservers to handle hire capacity and either a [load balancer](https://www.nginx.com/resources/glossary/load-balancing/) or [reverse proxy](https://www.cloudflare.com/en-ca/learning/cdn/glossary/reverse-proxy) is acting as a publicly visible DNS resolution that passes that request to 1 of many running web servers, here or in sessions section is a good place to talk about [sticky sessions](https://www.imperva.com/learn/availability/sticky-session-persistence-and-cookies/)
+It is much more likely that there are many webservers to handle hire capacity and either a [load balancer](https://www.nginx.com/resources/glossary/load-balancing/) or [reverse proxy](https://www.cloudflare.com/en-ca/learning/cdn/glossary/reverse-proxy) is acting as a publicly visible DNS resolution that passes that request to 1 of many running web servers. here or in sessions section is a good place to talk about [sticky sessions](https://www.imperva.com/learn/availability/sticky-session-persistence-and-cookies/)
+
+
+## Network Security:
+although not strictly necessary to talk about for the resolution of such a request here is a good point  in the conversation to bring [network security](https://blog.netwrix.com/2019/01/22/network-security-devices-you-need-to-know-about/). From the low level [firewall](https://en.wikipedia.org/wiki/Firewall_(computing)) to the higher level [WAF](https://en.wikipedia.org/wiki/Web_application_firewall) and concepts like IP [whitelisting](https://en.wikipedia.org/wiki/Whitelisting)
 
 
 ## Web server to application:
 There are a number of possible web servers and applications that could be used for this process.  For our example we'll be using [nginx](https://www.nginx.com/) and [ruby on rails](https://rubyonrails.org/) for this example
 
 In short nginx handles the up to OSI layer 6 and layer 7 is passed onto the Rails application to handle which is a good separation of responsibility allowing each layer to specialize and create an abstraction allowing for interchangeability or potential scaling
+
 
 
 ## Application:
@@ -114,7 +145,6 @@ See https://en.wikipedia.org/wiki/OAuth for more information
 #### Identity Providers:
 Using an external system like google or facebook for authentication instead of an internal system see https://en.wikipedia.org/wiki/Identity_provider for more information
 
-
 ### Routes:
 Once the request has been processed by all middleware the rails application will use the route of the request for a lookup in the routes definitions, so in our example case
 https://gitlab.com/gitlab-org/gitlab we will look up gitlab-org/gitlab in our [routes file](https://guides.rubyonrails.org/routing.html) to see which controller and method to call to process this request
@@ -134,7 +164,7 @@ For our example will likely make a request to a database for the ‘gitlab’ re
 #### Databases:
 There are a number of possible Databases the system could be connecting to each with pros and cons
 Some examples:
-- [SQL compliant](https://www.w3schools.com/sql/sql_intro.asp):
+- [SQL compliant](https://www.w3schools.com/sql/sql_intro.asp): (This is a good point to talk about [DB indexes}(https://en.wikipedia.org/wiki/Database_index))
    - Mysql
    - Postgres
 
@@ -163,6 +193,7 @@ However it is also possible to use rails to power modern single page apps like r
 It is worth noting that rails will use the content type header submitted by the request in order to help figure out which view it should use to compose the response
 
 
+
 ### Caching:
 Once the view is complete and returned there will be a number of caches that will keep information to speed up the response of that request should it be made again some examples:
 DB query level cache
@@ -172,9 +203,14 @@ See https://guides.rubyonrails.org/caching_with_rails.html for more information 
 
 This is also a good place to talk about [CDNs](https://en.wikipedia.org/wiki/Content_delivery_network) where static content can be stored in geodistributed caches to reduce latency
 
+---
+
+
+
 
 # Back to the Browser:
 Once the response it sent back to the browser a number of things happen in the browser to render the response
+
 
 ## Page Rendering:
 The actual page rendering has many steps
@@ -185,8 +221,13 @@ This is also where requests to additional CSS files, JS files and media will be 
 The result is then rendered on screen
 
 
-Once the page is fully rendered there might still be dynamic content that needs to be loaded and JS might make additional requests to get more data or media to load onto the page
-[Ajax](https://www.w3schools.com/js/js_ajax_http_send.asp) is the right place to start to get more information on that process 
+Once the page is fully rendered there might still be dynamic content that needs to be loaded or other actions taken, for example:
+- JS might make additional requests to get more data or media to load onto the page
+    - [Ajax](https://www.w3schools.com/js/js_ajax_http_send.asp) is the right place to start to get more information on that process.
+    - It is also possible to setup a pipe to allow a server to push data to the active webpage via [websockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- [Cookies](https://en.wikipedia.org/wiki/HTTP_cookie) might get set recording preferences or other information required for the web app
+- If we are using a single page JS framework like [react](https://reactjs.org/) the framework start to intercept some aspects of classic navigation
+- there might be a number of [tracking](https://en.ryte.com/wiki/Tracking_Pixel) or [Web Analytics](https://en.wikipedia.org/wiki/Web_analytics) systems that would be worth mentioning here
 
 
 
